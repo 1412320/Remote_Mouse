@@ -65,6 +65,13 @@ public class BTServer {
                             aRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
                             aRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
                         }
+                        else if (msg.equals("RC"))
+                        {
+                            System.out.println(msg);
+                            Robot aRobot = new Robot();
+                            aRobot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+                            aRobot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+                        }
 			else if(!msg.equals(""))
 			{
 				System.out.println(msg);
