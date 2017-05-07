@@ -4,7 +4,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
@@ -15,14 +17,15 @@ import java.util.UUID;
 public class BTService{
     private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private OutputStream outputStream = null;
+    private InputStream inputStream = null;
     private BluetoothSocket btSocket = null;
-    private static BTService instance = null;
+    private static BTService instance;
 
     private BTService(){
 
     }
 
-    public static BTService getInstance(){
+    public synchronized static BTService getInstance(){
         if(instance == null) {
             instance = new BTService();
         }
@@ -66,9 +69,34 @@ public class BTService{
         try {
             btSocket.connect();
             outputStream = btSocket.getOutputStream();
+            inputStream = btSocket.getInputStream();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean waitForConnection(){
+        try{
+            String msg = null;
+            while(true)
+            {
+                if(inputStream.available() > 0)
+                {
+                    byte[] buff = new byte[1024];
+                    inputStream.read(buff);
+                    msg = new String(buff, StandardCharsets.US_ASCII);
+                    msg = msg.split("@")[0];
+                    if(msg.equals("Connected"))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+        }catch(IOException e)
+        {
             return false;
         }
     }

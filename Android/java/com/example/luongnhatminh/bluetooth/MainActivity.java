@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
             devices = (ArrayList<BluetoothDevice>) savedInstanceState.getSerializable(LIST_DEVICES_KEY);
         }
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         CheckBluetooth();
         Init();
         toast = new Toast(MainActivity.this);
@@ -78,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!devices.isEmpty()) {
                     mBluetoothAdapter.cancelDiscovery();
-                    Touchpad(devices.get(position));
+                    Connect(devices.get(position));
+                    Touchpad();
                 }
             }
         });
@@ -167,9 +170,19 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
-    private void Touchpad(BluetoothDevice device){
+    private void Touchpad(){
         Intent touchpad = new Intent(getApplicationContext(), TouchpadActivity.class);
-        touchpad.putExtra("BTDevice", device);
         startActivity(touchpad);
+    }
+
+    private void Connect(BluetoothDevice device){
+        BTService service = BTService.getInstance();
+        if(!service.isCreated())
+        {
+            service.createBTSocketWithServer(device);
+            service.connectServer();
+            showToast("Connecting...");
+            service.waitForConnection();
+        }
     }
 }

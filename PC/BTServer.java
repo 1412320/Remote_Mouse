@@ -3,6 +3,8 @@ package bluetoothpc;
 import java.awt.AWTException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.bluetooth.*;
 import javax.microedition.io.*;
 
@@ -11,6 +13,7 @@ public class BTServer {
     private StreamConnectionNotifier streamCon = null;
     private StreamConnection connection = null;
     private InputStream input = null;
+    private OutputStream output = null;
     private final MyRobot bot = new MyRobot();
     
     public void startServer() throws IOException{
@@ -22,6 +25,19 @@ public class BTServer {
         System.out.println("Device address: " + dev.getBluetoothAddress());
         RemoteMouse.setText(dev.getFriendlyName(true), dev.getBluetoothAddress());
         input = connection.openInputStream();
+        output = connection.openOutputStream();
+        SendRes();
+    }
+    
+    private void SendRes(){
+        try {
+            String msg = "Connected@";
+            byte[] buff = msg.getBytes();
+            output.write(buff);
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(BTServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public int WaitForMsg() throws AWTException {
