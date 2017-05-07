@@ -21,10 +21,16 @@ public class MultiTouch extends View{
     private float initY =0;
     private float disX =0;
     private float disY =0;
+    static final int NONE = 0;
+    float startY, startY1, startX, startX1, startDistance;
+    float stopY, stopY1;
+    int TRESHOLD = 11;
+    int TRESHOLDZ = 20;
+    int mode = NONE;
+    boolean firstTouch = false;
     SparseArray<PointF> mPoint;
     BTService btService = BTService.getInstance();
     int[] colors = {Color.BLUE, Color.CYAN, Color.DKGRAY, Color.GREEN, Color.GRAY};
-    boolean isTouch = false;
     public MultiTouch(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView();
@@ -62,6 +68,7 @@ public class MultiTouch extends View{
                 initX = event.getX();
                 initY = event.getY();
                 moving = false;
+                firstTouch = true;
             case MotionEvent.ACTION_POINTER_DOWN: {
                 // Khai báo hai hàm Float và gán tọa độ X và Y của điểm chạm cho nó
                 float toadoX = event.getX(pointIndex);
@@ -72,14 +79,23 @@ public class MultiTouch extends View{
                 fpoint.x = toadoX;
                 fpoint.y = toadoY;
                 mPoint.put(poinId, fpoint);
+                if (count == 2) {
+
+                    // You can also use event.getY(1) or the average of the two
+                    startY = event.getY(0);
+                    startX = event.getX(0);
+                    startY1 = event.getY(1);
+                    startX1 = event.getX(1);
+                    startDistance = distance(event, 0, 1);
+                }
             }
             //  ACTION_MOVE là sự kiện khi ta di chuyển ngón tay trên màn hình
             // Hàm này sẽ cập nhập lại vị trí của điểm chạm khi di chuyển
             case MotionEvent.ACTION_MOVE: {
                 // tạo một hàm for để lấy ra tất cả các điểm chạm trên màn hình
                 // size là tổng số điểm chạm trên màn hình
-                    // Cập nhập lại tọa độ theo ID của từng điểm chạm
-                if (count == 1) {
+                // Cập nhập lại tọa độ theo ID của từng điểm chạm
+                if (count == 1 && firstTouch) {
                     disX = event.getX() - initX;
                     disY = event.getY() - initY;
                     initX = event.getX();
@@ -91,6 +107,34 @@ public class MultiTouch extends View{
                         sendCoor(f);
                         moving = true;
                     }
+                } else if (count == 2) {
+                    stopY = event.getY(0);
+                    stopY1 = event.getY(1);
+                    final float distanceCurrent = distance(event, 0, 1);
+                    final float diffX = startX - event.getX(0);
+                    final float diffY = startY - event.getY(0);
+                    final float diffX1 = startX1 - event.getX(1);
+                    final float diffY1 = startY1 - event.getY(1);
+                    if ((Math.abs(startY - stopY) > TRESHOLD) && (Math.abs(startY1 - stopY1) > TRESHOLD)
+                            && ((startY - stopY) * (startY1 - stopY1) > 0)) {
+                        PointF f = mPoint.get(event.getPointerId(0));
+                        f.x = 0;
+                        f.y = stopY - startY;
+                        btService.SendMsg("SC" + ":" + f.y);
+                    } else if (Math.abs(distanceCurrent - startDistance) >
+                            TRESHOLDZ
+                            && (diffY * diffY1) <= 0
+                            && (diffX * diffX1) <= 0) {
+                        float diff = (float) Math.sqrt(diffX * diffX + diffY * diffY);
+                        if ((distanceCurrent - startDistance) > 0)
+                            btService.SendMsg("ZO:" + diff);
+                        else
+                            btService.SendMsg("ZI:" + diff);
+                    }
+                    startY = stopY;
+                    startY1 = stopY1;
+                    startX = event.getX(0);
+                    startX1 = event.getX(1);
                 }
                 // Khi cập nhập tọa độ xong thì dừng lại
                 break;
@@ -99,13 +143,13 @@ public class MultiTouch extends View{
             case MotionEvent.ACTION_UP:
                 //mPoint.removeAt(poinId);
                 // ACTION_POINTER_UP: Khi ngón tay không còn chạm vào điểm chạm nữa.
-                if (!moving)
+                if (!moving && firstTouch)
                 {
                     btService.SendMsg("LC");
                 }
             case MotionEvent.ACTION_POINTER_UP:
-                //ACTION_CANCEL: Chấm dứt hoàn toàn việc chạm vào màn hình
-
+                moving = false;
+                firstTouch = false;
                 mPoint.removeAt(poinId);
             case MotionEvent.ACTION_CANCEL:
                 // Gỡ bỏ hoàn toàn các điểm với điều kiện ở trên theo ID từng điểm chạm
@@ -141,6 +185,16 @@ public class MultiTouch extends View{
         else {
             btService.connectServer();
             btService.SendMsg("[" + f.x + "," + f.y + "]");
+        }
+    }
+    public float distance(MotionEvent event, int first, int second) {
+        if (event.getPointerCount() >= 2) {
+            final float x = event.getX(first) - event.getX(second);
+            final float y = event.getY(first) - event.getY(second);
+
+            return (float) Math.sqrt(x * x + y * y);
+        } else {
+            return 0;
         }
     }
 }
