@@ -15,15 +15,28 @@ public class BTServer {
     private InputStream input = null;
     private OutputStream output = null;
     private final MyRobot bot = new MyRobot();
+    private static BTServer instance;
+    private RemoteDevice dev = null;
+    
+    public static BTServer getInstance(){
+        if(instance == null)
+        {
+           instance = new BTServer();
+        }
+        return instance;
+    }
+    
+    public RemoteDevice getConnectedDevice(){
+        return dev;
+    }
     
     public void startServer() throws IOException{
         String connectionString = "btspp://localhost:" + this.defaultUUID + ";name=PC BT Server";
         streamCon = (StreamConnectionNotifier)Connector.open(connectionString);
         connection = streamCon.acceptAndOpen();
-        RemoteDevice dev = RemoteDevice.getRemoteDevice(connection);
+        dev = RemoteDevice.getRemoteDevice(connection);
         System.out.println("Device name: " + dev.getFriendlyName(true));
         System.out.println("Device address: " + dev.getBluetoothAddress());
-        RemoteMouse.setText(dev.getFriendlyName(true), dev.getBluetoothAddress());
         input = connection.openInputStream();
         output = connection.openOutputStream();
         SendRes();
@@ -59,5 +72,8 @@ public class BTServer {
 
     public void CloseServer() throws IOException{
         streamCon.close();
+        connection.close();
+        input.close();
+        output.close();
     }
 }

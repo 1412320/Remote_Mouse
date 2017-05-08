@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
@@ -20,11 +21,18 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void Init(){
-        Button leftClick = (Button) findViewById(R.id.leftClick);
-        leftClick.setOnClickListener(new View.OnClickListener() {
+        final Button leftClick = (Button) findViewById(R.id.leftClick);
+//        leftClick.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                service.SendMsg("LC");
+//            }
+//        });
+        leftClick.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                service.SendMsg("LC");
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getActionButton() == MotionEvent.ACTION_BUTTON_PRESS)
+                return false;
             }
         });
 

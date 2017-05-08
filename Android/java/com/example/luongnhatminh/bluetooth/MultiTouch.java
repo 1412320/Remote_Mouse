@@ -24,8 +24,9 @@ public class MultiTouch extends View{
     static final int NONE = 0;
     float startY, startY1, startX, startX1, startDistance;
     float stopY, stopY1;
-    int TRESHOLD = 11;
+    int TRESHOLD = 10;
     int TRESHOLDZ = 20;
+    int tap_count = 0;
     int mode = NONE;
     boolean firstTouch = false;
     SparseArray<PointF> mPoint;
@@ -69,10 +70,12 @@ public class MultiTouch extends View{
                 initY = event.getY();
                 moving = false;
                 firstTouch = true;
+                tap_count++;
             case MotionEvent.ACTION_POINTER_DOWN: {
                 // Khai báo hai hàm Float và gán tọa độ X và Y của điểm chạm cho nó
                 float toadoX = event.getX(pointIndex);
                 float toadoY = event.getY(pointIndex);
+                tap_count++;
                 // Khai báo mảng PontF đã tạo ở trên
                 PointF fpoint = new PointF();
                 // gán tọa độ X - Y của điểm chạm cho mảng
@@ -147,9 +150,16 @@ public class MultiTouch extends View{
                 {
                     btService.SendMsg("LC");
                 }
+                tap_count--;
+                if (tap_count == 2)
+                {
+                    //btService.SendMsg("RC");
+                }
+                tap_count = 0;
             case MotionEvent.ACTION_POINTER_UP:
                 moving = false;
                 firstTouch = false;
+                tap_count++;
                 mPoint.removeAt(poinId);
             case MotionEvent.ACTION_CANCEL:
                 // Gỡ bỏ hoàn toàn các điểm với điều kiện ở trên theo ID từng điểm chạm

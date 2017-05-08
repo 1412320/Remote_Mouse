@@ -39,6 +39,16 @@ public class MyRobot {
                 leftclick(msg);
                
             }
+            else if (msg.equals("HLC"))
+            {
+                holdleftclick(msg);
+               
+            }
+            else if (msg.equals("RLC"))
+            {
+                releaseleftclick(msg);
+               
+            }
             else if (msg.equals("RC"))
             {
                 rightclick(msg);
@@ -145,6 +155,18 @@ public class MyRobot {
         aRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
     }
     
+    private void holdleftclick(String msg)
+    {
+        System.out.println(msg);
+        aRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+    }
+
+    private void releaseleftclick(String msg)
+    {
+        System.out.println(msg);
+        aRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+    }
+
     private void rightclick(String msg)
     {
         System.out.println(msg);

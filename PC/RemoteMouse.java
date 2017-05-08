@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.io.IOException;
 
 public class RemoteMouse extends javax.swing.JFrame {
-    private static final BTServer bt = new BTServer();
+    private static BTServer bt = BTServer.getInstance();
     public RemoteMouse() {
         initComponents();
     }
@@ -212,6 +212,7 @@ public class RemoteMouse extends javax.swing.JFrame {
             new RemoteMouse().setVisible(true);
         });
 	bt.startServer();
+        setText(bt.getConnectedDevice().getFriendlyName(true), bt.getConnectedDevice().getBluetoothAddress());
         try 
         {
             while(bt.WaitForMsg() == 1)
