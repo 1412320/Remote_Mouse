@@ -33,6 +33,12 @@ public class BTServer {
     }
     
     public void startServer() throws IOException{
+        LocalDevice local = LocalDevice.getLocalDevice();
+        if(local.setDiscoverable(DiscoveryAgent.GIAC))
+            System.out.println("Success to set Discoverable");
+        else
+            System.out.println("Fail to set Discoverable");
+        
         String connectionString = "btspp://localhost:" + this.defaultUUID + ";name=PC BT Server";
         streamCon = (StreamConnectionNotifier)Connector.open(connectionString);
         connection = streamCon.acceptAndOpen();
