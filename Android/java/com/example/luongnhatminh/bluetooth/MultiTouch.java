@@ -59,7 +59,7 @@ public class MultiTouch extends View{
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int pointIndex = event.getActionIndex();
-        int poinId = event.getPointerId(pointIndex);
+        int pointId = event.getPointerId(pointIndex);
         int maskAction = event.getActionMasked();
         int count = event.getPointerCount();
         switch (maskAction) {
@@ -81,7 +81,7 @@ public class MultiTouch extends View{
                 // gán tọa độ X - Y của điểm chạm cho mảng
                 fpoint.x = toadoX;
                 fpoint.y = toadoY;
-                mPoint.put(poinId, fpoint);
+                mPoint.put(pointId, fpoint);
                 if (count == 2) {
 
                     // You can also use event.getY(1) or the average of the two
@@ -144,7 +144,7 @@ public class MultiTouch extends View{
             }
             // ACTION_UP: Khi nhấc ngón tay lên
             case MotionEvent.ACTION_UP:
-                //mPoint.removeAt(poinId);
+                //mPoint.removeAt(pointId);
                 // ACTION_POINTER_UP: Khi ngón tay không còn chạm vào điểm chạm nữa.
                 if (!moving && firstTouch)
                 {
@@ -160,10 +160,10 @@ public class MultiTouch extends View{
                 moving = false;
                 firstTouch = false;
                 tap_count++;
-                mPoint.removeAt(poinId);
+                mPoint.removeAt(pointId);
             case MotionEvent.ACTION_CANCEL:
                 // Gỡ bỏ hoàn toàn các điểm với điều kiện ở trên theo ID từng điểm chạm
-                //mPoint.removeAt(poinId);
+                //mPoint.removeAt(pointId);
         }
         invalidate();
         return true;

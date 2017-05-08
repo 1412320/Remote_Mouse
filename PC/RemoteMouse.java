@@ -193,6 +193,7 @@ public class RemoteMouse extends javax.swing.JFrame {
     private void disconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnectActionPerformed
         try {
             bt.CloseServer();
+            setTextDisable();
         } catch (IOException ex) {
         }
     }//GEN-LAST:event_disconnectActionPerformed
@@ -212,7 +213,7 @@ public class RemoteMouse extends javax.swing.JFrame {
             new RemoteMouse().setVisible(true);
         });
 	bt.startServer();
-        setText(bt.getConnectedDevice().getFriendlyName(true), bt.getConnectedDevice().getBluetoothAddress());
+        setTextEnable(bt.getConnectedDevice().getFriendlyName(true), bt.getConnectedDevice().getBluetoothAddress());
         try 
         {
             while(bt.WaitForMsg() == 1)
@@ -224,13 +225,22 @@ public class RemoteMouse extends javax.swing.JFrame {
         bt.CloseServer();
     }
     
-    public static void setText(String name, String address)
+    public static void setTextEnable(String name, String address)
     {
         deviceName.setText(name);
         deviceAddress.setText(address);
         status.setText("Connected");
         status.setForeground(Color.green);
         disconnect.setEnabled(true);
+    }
+    
+    public static void setTextDisable()
+    {
+        deviceName.setText("null");
+        deviceAddress.setText("null");
+        status.setText("No connection");
+        status.setForeground(Color.red);
+        disconnect.setEnabled(false);
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

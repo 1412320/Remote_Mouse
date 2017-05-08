@@ -17,6 +17,8 @@ public class BTServer {
     private final MyRobot bot = new MyRobot();
     private static BTServer instance;
     private RemoteDevice dev = null;
+    private LocalDevice ld = null;
+    private DiscoveryAgent da = null;
     
     public static BTServer getInstance(){
         if(instance == null)
@@ -39,6 +41,9 @@ public class BTServer {
         System.out.println("Device address: " + dev.getBluetoothAddress());
         input = connection.openInputStream();
         output = connection.openOutputStream();
+        ld = LocalDevice.getLocalDevice();
+        ld.setDiscoverable(DiscoveryAgent.GIAC);
+        da = ld.getDiscoveryAgent();
         SendRes();
     }
     

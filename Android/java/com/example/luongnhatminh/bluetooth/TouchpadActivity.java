@@ -31,7 +31,14 @@ public class TouchpadActivity extends AppCompatActivity {
         leftClick.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getActionButton() == MotionEvent.ACTION_BUTTON_PRESS)
+                if(event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    service.SendMsg("HLC");
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    service.SendMsg("RLC");
+                }
                 return false;
             }
         });
